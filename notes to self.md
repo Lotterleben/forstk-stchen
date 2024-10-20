@@ -7,16 +7,34 @@
 - desired audio in .wav übersetzen, datei einlesen, nach i2s kippen
 
 ### Pin Mapping
-stm32f4xx_hal::i2s::I2s pins -> Amp Pins:
+Board Pins -> stm32f4xx_hal::i2s::I2s pins -> Amp Pins:
 
-SPI::Ws -> LRC
-SPI::Ck -> BCLK
-SPI::Mck -> Not Needed ( ->  stm32f4xx_hal::i2s::NoMasterClock verwenden?)
-SP::Sd -> DIN
+Board\*      | stm32f4xx_hal::i2s::I2s  | Amp
+(BEI AF05   |                          |
+AUF PORT A) |                          |
+------------+--------------------------+------
+PA5         | SPI::Ck                  | BCLK (Bit Clock)
+--          | SPI::Mck                 | Not Needed ( ->  stm32f4xx_hal::i2s::NoMasterClock verwenden?)
+PA7         | SP::Sd (Serial Data?)    | DIN (Data In)
+PA4         | SPI::Ws                  | LRC (Left/Right Clock)
++5V         |                          | Vin (Voltage In)
+GND         |                          | GND    
+
+*\* Wo  sich PA4/5/7 auf dem Board befinen, steht in um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf, S. 68*
+
+
+# checkpoints im code (ungeordnet)
+- alternate function setzen (AF05 für Port A)
 
 Quellen: 
-- adafruit-max98357-i2s-class-d-mono-amp-3.pdf
+- adafruit-max98357-i2s-class-d-mono-amp-3.pdf (Amp Pins)
 - https://docs.rs/stm32f4xx-hal/0.21.0/stm32f4xx_hal/i2s/struct.I2s.html
+- rm0383-stm32f411xce-advanced-armbased-32bit-mcus-stmicroelectronics.pdf -> welche chip pins kann/muss ich verwenden?
+- user manual -> an welche board pins werden meine chip pins weitergeleitet?
+
+
+### Mögliche hilfreiche Links
+- https://stackoverflow.com/questions/70048351/stm32-i2s-input-not-working-when-using-dma zum spicken?
 
 ### Offene Fragen
 - wie krieg ich die .wav daten in das kompilat?
