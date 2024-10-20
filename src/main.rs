@@ -17,6 +17,7 @@ mod app {
 
     use rtic_monotonics::fugit::RateExtU32;
     use stm32f4xx_hal::gpio::{GpioExt, Output, PA5};
+    use stm32f4xx_hal::i2s::I2s;
     use stm32f4xx_hal::prelude::_stm32f4xx_hal_rcc_RccExt;
     use stm32f4xx_hal::timer::MonoTimerExt;
 
@@ -24,19 +25,17 @@ mod app {
     struct Shared {}
 
     #[local]
-    struct Local {
-        // this is the "user LD2" led
-        led_ld2: PA5<Output>, // only one task uses the LED, so it's local
-    }
+    struct Local {}
 
     #[init]
     fn init(mut ctx: init::Context) -> (Shared, Local) {
         defmt::info!("Forstkaestchen up and running 🦌 ");
-        // let bytes = include_bytes!("test.in"); // <- this should be the .wav file in the future
-        // defmt::info!("bytes {}", bytes);
 
         let rcc = ctx.device.RCC.constrain();
-        let clocks = rcc.cfgr.sysclk(48_u32.MHz()).freeze();
+        // TODO: clock config ok?
+        // The 61440 kHz frequency can be divided to get exactly 48 kHz sample rate even when
+        // generating master clock
+        let clocks = rcc.cfgr.sysclk(48_u32.MHz()).i2s_clk(61440.kHz()).freeze();
 
         // Create TIM3 monotonic and initialize timer queue
         ctx.device.TIM3.monotonic_us(&mut ctx.core.NVIC, &clocks);
@@ -47,21 +46,30 @@ mod app {
 
         defmt::info!("timer initialized");
 
+        let i2s_ws_pin = gpioa.pa4;
+        let i2s_sd_pin = gpioa.pa7;
+        let i2s_ck_pin = gpioa.pa5;
+
+        let i2s = I2s::new(
+            ctx.device.SPI1,
+            (
+                i2s_ws_pin,
+                i2s_ck_pin,
+                stm32f4xx_hal::i2s::NoMasterClock::new(),
+                i2s_sd_pin,
+            ),
+            &clocks,
+        );
+
         blinky::spawn().ok();
 
-        (
-            Shared {},
-            Local {
-                led_ld2: gpioa.pa5.into_push_pull_output(),
-            },
-        )
+        (Shared {}, Local {})
     }
 
-    #[task(local = [led_ld2])]
-    async fn blinky(ctx: blinky::Context) {
+    #[task()]
+    async fn blinky(_ctx: blinky::Context) {
         loop {
-            ctx.local.led_ld2.toggle();
-            Mono::delay(500.millis().into()).await;
+            defmt::info!("bling ✨");
         }
     }
 }

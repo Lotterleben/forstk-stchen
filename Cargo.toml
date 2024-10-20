@@ -17,7 +17,7 @@ rtic = { version = "2.0.1", features = [
 rtic-monotonics = { version = "2.0.2", features = ["cortex-m-systick"] }
 
 [dependencies.stm32f4xx-hal]
-features = ["stm32f411", "defmt", "rtic-tim3", "rtic2"]
+features = ["stm32f411", "defmt", "rtic-tim3", "rtic2", "i2s"]
 
 version = "0.22.0"
 # Set the default for dependencies.
