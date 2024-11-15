@@ -9,18 +9,19 @@
 ### Pin Mapping
 Board Pins -> stm32f4xx_hal::i2s::I2s pins -> Amp Pins:
 
-Board\*      | stm32f4xx_hal::i2s::I2s  | Amp
+Board\*     | stm32f4xx_hal::i2s::I2s  | Amp
 (BEI AF05   |                          |
 AUF PORT A) |                          |
-------------+--------------------------+------
+------------+--------------------------+-----------------------
 PA5         | SPI::Ck                  | BCLK (Bit Clock)
 --          | SPI::Mck                 | Not Needed ( ->  stm32f4xx_hal::i2s::NoMasterClock verwenden?)
-PA7         | SP::Sd (Serial Data?)    | DIN (Data In)
+PA7         | SP::Sd (Serial Data?)    | DIN (Data In) (⚠️ *nicht* SD!)
 PA4         | SPI::Ws                  | LRC (Left/Right Clock)
 +5V         |                          | Vin (Voltage In)
 GND         |                          | GND    
 
-*\* Wo  sich PA4/5/7 auf dem Board befinen, steht in um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf, S. 68*
+
+*\* Wo  sich PA4/5/7 auf dem Board befinen, steht in um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf, S. 32*
 
 
 # checkpoints im code (ungeordnet)
@@ -35,6 +36,7 @@ Quellen:
 
 ### Mögliche hilfreiche Links
 - https://stackoverflow.com/questions/70048351/stm32-i2s-input-not-working-when-using-dma zum spicken?
+- https://hackaday.com/2019/04/18/all-you-need-to-know-about-i2s/
 
 ### Offene Fragen
 - wie krieg ich die .wav daten in das kompilat?
